@@ -1,0 +1,32 @@
+## MySQL 相关资料
+
+
+### ubuntu16.04_安装遇到的问题及解决
+
+- docker search mysql
+- docker pull mysql:latest
+- docker images |grep mysql
+- docker run -p 3306:3306 --name mymysql -v $PWD/conf:/etc/mysql/conf.d -v $PWD/logs:/logs -v $PWD/data:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=123456 -d mysql:latest
+
+>-p 3306:3306：将容器的 3306 端口映射到主机的 3306 端口。
+
+>-v -v $PWD/conf:/etc/mysql/conf.d：将主机当前目录下的 conf/my.cnf 挂载到容器的 /etc/mysql/my.cnf。
+
+>-v $PWD/logs:/logs：将主机当前目录下的 logs 目录挂载到容器的 /logs。
+
+>-v $PWD/data:/var/lib/mysql ：将主机当前目录下的data目录挂载到容器的 /var/lib/mysql 。
+
+>-e MYSQL_ROOT_PASSWORD=123456：初始化 root 用户的密码。
+
+- docker ps
+- docker exec -it mysqldb /bin/bash <!--进入容器-->
+
+#### Navicat for MySQL 连接 mysql
+- 错误Client does not support authentication protocol requested by server; consider upgrading MySQL client
+- 进入容器后，执行 mysql -uroot -p 然后输入密码
+>ALTER USER 'root'@'%' IDENTIFIED WITH mysql_native_password BY '你的密码';
+
+>ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY '你的密码';
+
+>SELECT plugin FROM mysql.user WHERE User = 'root';
+- 再使用 Navicat for MySQL 连接就成功了

@@ -1,0 +1,13 @@
+# Crontab爬虫定时执行
+
+### 执行python程序
+- 先把python的执行命令写入.sh脚本
+- 给.sh脚本添加可执行权限
+- 把.sh程序写入crontab配置文件中
+
+
+一个myspider.sh的例子
+
+#! /bin/sh
+cd `dirname $0` || exit 1
+python ./main.py >>run.log 2>&1

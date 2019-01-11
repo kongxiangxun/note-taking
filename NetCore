@@ -1,0 +1,5 @@
+
+### 未能找到文件“\bin\roslyn\csc.exe”
+出现这个问题可能是因为VS没有把Roslyn的编译器正确地放到网站Bin文件夹的roslyn文件夹中。这时候可以从Nuget程序包文件夹中复制Roslyn编译器到网站的Bin/roslyn文件夹中。Nuget程序包文件夹一般与.sln解决方案文件在同一个目录下。Roslyn编译器在Nuget文件夹中的路径是：
+packages\Microsoft.Net.Compilers.1.0.0\tools
+把这个文件夹中的文件全部复制过去就行了。
