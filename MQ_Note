@@ -1,0 +1,15 @@
+### Kafka
+
+- kafka高可用性，使用replica副本机制来保证高可用，
+ - 写数据的时候，生产者就写leader，然后leader将数据落地写本地磁盘，接口其他follower自己主动从leader来pull数据。一旦所有follower同步好数据了，就会发送ack给leader，leader收到所有follower的ack之后，就会返回写成功的消息给生产者。
+ - 消费的时候，只从leader读取数据，但是只有一个消息已经被所有follower都同步成功返回ack的时候，这个消息才会被消费。
+- 使用kakfa必须要保证幂等性，也就是重复消费不影响。
+- 处理消费端弄丢了数据：因为 Kafka 会自动提交 offset，需要关闭自动提交 offset，
+创建消费只的时候传入的键值对属性enable.auto.commit为false，然后每次消费成功手动提交 offset
+- 防止生产者弄丢数据，设置 acks=all，一定不会丢，要求是，你的 leader 接收到消息，所有的 follower 都同步到了消息之后，才认为本次写成功了。如果没满足这个条件，生产者会自动不断的重试，重试无限次。
+
+- kafka防止丢数据配置：
+ - 给 topic 设置 replication.factor 参数：这个值必须大于 1，要求每个 partition 必须有至少 2 个副本。
+ - 在 Kafka 服务端设置 min.insync.replicas 参数：这个值必须大于 1，这个是要求一个 leader 至少感知到有至少一个 follower 还跟自己保持联系，没掉队，这样才能确保 leader 挂了还有一个 follower 吧。
+ - 在 producer 端设置 acks=all：这个是要求每条数据，必须是写入所有 replica 之后，才能认为是写成功了。
+ - 在 producer 端设置 retries=MAX（很大很大很大的一个值，无限次重试的意思）：这个是要求一旦写入失败，就无限重试，卡在这里了。
