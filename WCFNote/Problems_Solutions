@@ -1,0 +1,26 @@
+### WCF 套接字连接已中止。这可能是由于处理消息时出错或远程主机超过接收超时或者潜在的网络资源问题导致的
+
+一个项目需要用到推送的功能，就是服务器主动推送数据给多台客户机。于是采用了WCF的双工通讯netTcpBinding
+
+写好的项目，在本机测试都没有问题。
+
+如果放在局域网内测试，问题出来了；先是安全性问题，后面就是 套接字连接已中止。。。。。。。。。。。这一串问题了；
+
+安全性问题：
+```xml
+<netTcpBinding>
+        <binding name="NewBinding" maxReceivedMessageSize="2147483647" transferMode="Buffered">
+          <readerQuotas maxStringContentLength="2147483647" maxArrayLength="12000000"/>
+          <security mode="None">
+            <transport clientCredentialType="None"></transport>
+          </security>
+        </binding>
+</netTcpBinding>
+```
+这样设置,或者<security mode="None">
+
+结果是因为少了一个配置属性，在设置tcp的endpoint上指定 bindingConfiguration="NewBinding"
+```xml
+<endpoint address="" binding="netTcpBinding" bindingConfiguration="NewBinding" contract="AssetWcfService.IMonitorLog">
+</endpoint>
+```
