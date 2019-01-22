@@ -1,0 +1,31 @@
+### Fiddler+Willow
+
+下载地址： [Fiddler+Willow][1]
+>下载地址： [Fiddler+Willow](http//:www.baidu.com)
+
+[1]: http://google.com/        "Google"
+
+#### 好处：
+- 方便管理Host，切换可以立即生效。
+- Fiddler本身就有很多实用功能，一个软件可以搞定的事就不需要两个软件做了。
+
+#### Fiddler小技巧：
+- ![avatar](/Images/Fiddler/Fiddler_Willow_Tips.png)
+
+#### 提示：
+- Fiddler在win10下，如果不能拦截部分https请求，那么需要配置才能中断Https，配置方法如下：
+https://jingyan.baidu.com/article/ff42efa9f0c803c19f22027f.html
+
+#### Willow介绍：
+- Willow是Fiddler的一个小插件，需要单独安装，它是腾讯内部开发的一个工具，现已开源，地址为https://github.com/QzoneTouch/commonWidget/releases
+- 安装好willow后，Fiddler右边会出现willow的页签，如下图：
+- ![avatar](/Images/Fiddler/Filddler_Willow_Hosts.png)
+##### 用法：
+- 1、右键空白处，会有Add Project，这个是增加一个分类，比如开发环境，测试环境等等。
+- 2、Manage Host ，可以批量增加Host。
+- 3、点开每个分类前面的+号，就可以可视化的看到自己写的Host内容，勾选或取消勾选，即可启用或取消host的指向。
+- 4、双击单个Host，可以单独编辑Host内容。
+- 5、勾选Project分类前面的复选框，可以决定是否启用这个分类的Host。
+
+### 抓手机请求
+https://blog.csdn.net/m0_37554415/article/details/80434477
