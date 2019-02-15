@@ -1,0 +1,89 @@
+### RedisCluster使用
+
+- Redis编译安装
+ - 执行命令：
+ ```
+ $ wget http://download.redis.io/releases/redis-4.0.8.tar.gz
+ $ tar xzf redis-4.0.8.tar.gz
+ $ cd redis-4.0.8
+ $ make
+ $ make install
+ ```
+ - 安装ruby环境
+ ```
+ $ apt-get install ruby
+ $ gem install redis
+ ```
+ - 创建cluster目录并在cluster下创建6个目录,名称以端口号命名，分别用于存放不同redis配置文件
+  - 配置文件分别修改  daemonize  yes  后台启动
+  - 修改端口号对应目录的端口号 port 700*
+  - Ip绑定 绑定本机ip 或者注释 bind 127.0.0.1
+  - 数据位置 dir /usr/local/cluster/700*/
+  - 开启集群 cluster-enabled yes
+  - 修改集群配置文件 cluster-config-file nodes-700*.conf
+  - 开启持久化 appendonly yes
+  - 修改保护模式 protected-mode no
+
+
+- Redis集群脚本启动
+ - 新建Redis启动脚本，redis-start.sh文件
+ - 加入以下内容
+  ```
+  #!/bin/sh
+/usr/local/redis3.0/src/redis-server /usr/local/cluster/7000/redis.conf &
+/usr/local/redis3.0/src/redis-server /usr/local/cluster/7001/redis.conf &
+/usr/local/redis3.0/src/redis-server /usr/local/cluster/7002/redis.conf &
+/usr/local/redis3.0/src/redis-server /usr/local/cluster/7003/redis.conf &
+/usr/local/redis3.0/src/redis-server /usr/local/cluster/7004/redis.conf &
+/usr/local/redis3.0/src/redis-server /usr/local/cluster/7005/redis.conf &
+  ```
+ - 新建关闭Redis脚本，redis-shutdown.sh文件
+ ```
+ #!/bin/sh
+redis-cli -c -h 10.129.10.119 -p 7001 shutdown &
+redis-cli -c -h 10.129.10.119 -p 7002 shutdown &
+redis-cli -c -h 10.129.10.119 -p 7003 shutdown &
+redis-cli -c -h 10.129.10.119 -p 7004 shutdown &
+redis-cli -c -h 10.129.10.119 -p 7005 shutdown &
+redis-cli -c -h 10.129.10.119 -p 7006 shutdown &
+ ```
+ - 脚本赋予执行权限
+ ```
+ chmod +x /usr/local/cluster/redis-start
+ ```
+ - 执行 /usr/local/cluster/redis-start.sh
+ - 查看 Redis进程
+  ```
+  ps -ef|grep redis
+  ```
+ - 集群开启
+ ```
+ /root/redis-4.0.8/src/redis-trib.rb  create --replicas 1 10.129.10.119:7001 10.129.10.119:7002 10.129.10.119:7003 10.129.10.119:7004 10.129.10.119:7005 10.129.10.119:7006
+ ```
+ - 添加删除节点
+   -  增加节点
+     - 使用add-node命令增加节点。
+      首先配置7007节点，方法与7001-7006配置相同只是修改端口号。
+      再次启动7007节点。
+      然后使用如下命令将7007添加至集群中
+      redis-trib.rb add-node 192.168.1.104:7007 192.168.1.104:7001 向集群添加主节点
+      redis-trib.rb add-node --slave 192.168.1.104:7007 192.168.1.104:7001 向集群中添加从节点，它会随机分配给任意一个主节点
+      redis-trib.rb add-node --slave --master-id 3c3a0c74aae0b56170ccb03a76b60cfe7dc1912e 192.168.1.104:7007 192.168.1.104:7001 向集群中定向的主节点添加从节点
+      第一个参数：新添加节点的地址以及端口192.168.1.104:7007
+      第二个参数：现有集群中任意一个服务端地址以及端口192.168.1.104:7001
+    - 然后会让你输入分配的槽数，范围在1-16384，我输入4000.然后会询问你从哪个节点分出这些槽数，我选择all所有节点中。
+    - 接下来会让你输入 要分配的节点的nodeid  What is the receiving node ID?  粘贴要分配的nodeID就可以
+    - 最后会询问你是否执行这个分槽计划，输入yes开始执行计划。
+   - 移除节点
+    - 从新分槽，将要移除节点的slots槽全部分配到其他节点，
+    - 执行命令redis-trib reshard 192.168.1.5.7007(redis-trib reshard 192.168.1.5.7007)，
+    - 先让输入要移除的slot数量，然后输入接收节点nodeID，
+    - 然后输入源节点也就是要移除的节点nodeID，
+    - 然后输入done，最后yes
+    - 再使用del-node命令移除节点。
+      redis-trib del-node 1.2.168.1.104:7001 <node-id>
+      第一个参数：任意集群中现有的地址192.168.1.104:7001
+      第二个参数：你想移除的节点id ab853f5e95f1e32e0ee40543a9687d60fc3bd941 （该id可以在想要移除的节点nodes.conf文件中找到）
+   - 注意
+     - 在配置集群时出现 [ERR] Sorry, can't connect to node 错误，原因之一是redis.windows.conf的bind 地址使用了127.0.0.1，将地址修改为服务器的固定ip后解决了
+     - 在重新启动集群是出现了CLUSTERDOWN The cluster is down 错误，检查了redis.windows.conf文件与nodes.conf发现里面的IP地址与机器IP地址不同，将配置文件中的ip修改为机器ip后解决问题。
