@@ -1,0 +1,18 @@
+### 在虚拟机安装完成ubuntu之后想使用xshell在windows通过ssh连接ubuntu发现失败，提示问题被服务器拒绝
+ - 关闭防火墙
+  - udo ufw disable 或者 ufw allow 22/tcp 接着尝试使用ssh连接
+ - ping ip地址查看网段是否在同一网段
+  - 网段不在一个的建议直接使用直连，或者手动分配ip
+ - 直接使用安装ssh服务
+  - 输入：sudo apt-get install openssh-server进行安装，输入y确定
+ - 安装完成后尝试ssh链接
+ - 如果不成功，尝试开启服务输入：sudo /etc/init.d/ssh start 开启服务
+  
+
+### 用winscp的root连接ubuntu“拒绝访问”的解决方法
+- ubuntu 服务器默认的root账号是没有激活的，需要用初装的用户账号给root设置管理密码：
+ - $ sudo passwd root //用sudo修改root账户
+ - 修改成功之后你就可以使用root账号了，可以使用su root 命令切换到root
+ - 就是修改之后，直接用root账号无法登陆远程终端，这是还需要修改ssh配置文件
+   - 修改配置文件 /etc/ssh/sshd_config
+   - 将 PermitRootLogin without-password  修改为 PermitRootLogin yes
