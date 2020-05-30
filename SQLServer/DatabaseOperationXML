@@ -1,0 +1,8 @@
+### 操作XML案例
+
+```sql
+CONVERT(NVARCHAR(MAX), amla.PropertyXml.query('/AssessmentModuleSetting/ModuleSettings/ModuleSetting/StrConditions/text()'))
+PropertyXml.modify('insert  <StrConditions>{sql:variable(''@StrConditions'')}</StrConditions> as last into  (/AssessmentModuleSetting/ModuleSettings/ModuleSetting)[1]')
+PropertyXml.modify('replace value of (/AssessmentModuleSetting/ModuleSettings/ModuleSetting/StrConditions/text())[1] with sql:variable("@StrConditions")')
+
+```

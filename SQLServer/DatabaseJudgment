@@ -1,0 +1,19 @@
+### 数据库中一些判断
+- 判断是否存在存储过程
+``` sql
+IF EXISTS ( SELECT  *
+            FROM    sys.objects
+            WHERE   object_id = OBJECT_ID(N'[dbo].[API_Get_ActivityManagerByYearPeroid]')
+                    AND type IN ( N'P', N'PC' ) )
+    DROP PROCEDURE [dbo].[API_Get_ActivityManagerByYearPeroid];
+```
+- 判断是否存在临时表
+```sql
+IF EXISTS ( SELECT  *
+            FROM    tempdb.dbo.sysobjects
+            WHERE   id = OBJECT_ID(N'tempdb..#assessmentModuleTemp')
+                    AND type = 'U' )
+    BEGIN
+        DROP TABLE #assessmentModuleTemp;
+    END;
+```
